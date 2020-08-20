@@ -9,9 +9,6 @@ class WorkoutScreen extends StatelessWidget {
   static String get routeName => "/workout";
   @override
   Widget build(BuildContext context) {
-    // final db = Provider.of<AppDatabase>(context);
-    print("Building ${toString()}");
-    // final data = Provider.of<List<ExerciseRecord>>(context);
     final db = Provider.of<AppDatabase>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
@@ -32,7 +29,7 @@ class WorkoutScreen extends StatelessWidget {
           );
           db.insertNewEntries(entry);
         },
-        tooltip: "add  ew exercise",
+        tooltip: "add new exercise",
       ),
     );
   }
