@@ -2,8 +2,8 @@ import 'package:fitter/models/table.dart';
 import 'package:fitter/widgets/common/tile.dart';
 import 'package:flutter/material.dart';
 
-class ExerciseTile extends StatelessWidget {
-  const ExerciseTile(this.record);
+class WorkoutItemTile extends StatelessWidget {
+  const WorkoutItemTile(this.record);
 
   final ExerciseRecord record;
   @override

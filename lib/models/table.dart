@@ -9,21 +9,48 @@ class ExerciseRecords extends Table {
 
   IntColumn get numSets => integer()();
 
-  TextColumn get name => text().withLength(min: 1, max: 30)();
+  TextColumn get name => text().customConstraint("REFERENCE exercises(name)")();
 }
 
-@UseMoor(tables: [ExerciseRecords])
+class Exercises extends Table {
+  TextColumn get name => text().withLength(min: 1, max: 50)();
+
+  TextColumn get muscle => text().withLength(min: 1, max: 20)();
+  BoolColumn get useBodyWeight =>
+      boolean().withDefault(const Constant(false))();
+}
+
+@UseMoor(
+    tables: [ExerciseRecords, Exercises],
+    daos: [ExerciseRecordsDao, ExercisesDao])
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
-      : super(FlutterQueryExecutor.inDatabaseFolder(
-            path: 'db.sqlite', logStatements: true));
+      : super(
+          FlutterQueryExecutor.inDatabaseFolder(
+              path: 'db.sqlite', logStatements: true),
+        );
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
-  Future<List<ExerciseRecord>> getAllEntries() {
-    return select(exerciseRecords).get();
-  }
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        beforeOpen: (details) async {
+          await customStatement('PRAGMA foreign_keys = ON');
+        },
+        onUpgrade: (migrator, from, to) {
+          if (from == 1) {
+            migrator.createTable(exercises);
+          }
+        },
+      );
+}
+
+@UseDao(tables: [ExerciseRecords])
+class ExerciseRecordsDao extends DatabaseAccessor<AppDatabase>
+    with _$ExerciseRecordsDaoMixin {
+  final AppDatabase db;
+  ExerciseRecordsDao(this.db) : super(db);
 
   Stream<List<ExerciseRecord>> watchAllEntries() {
     return select(exerciseRecords).watch();
@@ -33,8 +60,25 @@ class AppDatabase extends _$AppDatabase {
     return into(exerciseRecords).insert(entry);
   }
 
+  // WARNING: This function sould only be used for testing purpose
   Future resetDB() {
     return (delete(exerciseRecords)..where((t) => t.id.isBiggerOrEqualValue(0)))
         .go();
+  }
+}
+
+@UseDao(tables: [Exercises])
+class ExercisesDao extends DatabaseAccessor<AppDatabase>
+    with _$ExercisesDaoMixin {
+  final AppDatabase db;
+  ExercisesDao(this.db) : super(db);
+
+  Stream<List<Exercise>> watchAllExercises() {
+    return select(exercises).watch();
+  }
+
+  Future<int> insert(String name, String bodyPart) {
+    return into(exercises)
+        .insert(ExercisesCompanion.insert(name: name, muscle: bodyPart));
   }
 }
