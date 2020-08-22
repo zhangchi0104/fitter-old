@@ -11,12 +11,12 @@ class ExerciseRecord extends DataClass implements Insertable<ExerciseRecord> {
   final int id;
   final int amountPerSet;
   final int numSets;
-  final String name;
+  final String exerciseName;
   ExerciseRecord(
       {@required this.id,
       @required this.amountPerSet,
       @required this.numSets,
-      @required this.name});
+      @required this.exerciseName});
   factory ExerciseRecord.fromData(
       Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
@@ -29,7 +29,8 @@ class ExerciseRecord extends DataClass implements Insertable<ExerciseRecord> {
           intType.mapFromDatabaseResponse(data['${effectivePrefix}amount']),
       numSets:
           intType.mapFromDatabaseResponse(data['${effectivePrefix}num_sets']),
-      name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name']),
+      exerciseName: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}exercise_name']),
     );
   }
   @override
@@ -44,8 +45,8 @@ class ExerciseRecord extends DataClass implements Insertable<ExerciseRecord> {
     if (!nullToAbsent || numSets != null) {
       map['num_sets'] = Variable<int>(numSets);
     }
-    if (!nullToAbsent || name != null) {
-      map['name'] = Variable<String>(name);
+    if (!nullToAbsent || exerciseName != null) {
+      map['exercise_name'] = Variable<String>(exerciseName);
     }
     return map;
   }
@@ -59,7 +60,9 @@ class ExerciseRecord extends DataClass implements Insertable<ExerciseRecord> {
       numSets: numSets == null && nullToAbsent
           ? const Value.absent()
           : Value(numSets),
-      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      exerciseName: exerciseName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(exerciseName),
     );
   }
 
@@ -70,7 +73,7 @@ class ExerciseRecord extends DataClass implements Insertable<ExerciseRecord> {
       id: serializer.fromJson<int>(json['id']),
       amountPerSet: serializer.fromJson<int>(json['amountPerSet']),
       numSets: serializer.fromJson<int>(json['numSets']),
-      name: serializer.fromJson<String>(json['name']),
+      exerciseName: serializer.fromJson<String>(json['exerciseName']),
     );
   }
   @override
@@ -80,17 +83,17 @@ class ExerciseRecord extends DataClass implements Insertable<ExerciseRecord> {
       'id': serializer.toJson<int>(id),
       'amountPerSet': serializer.toJson<int>(amountPerSet),
       'numSets': serializer.toJson<int>(numSets),
-      'name': serializer.toJson<String>(name),
+      'exerciseName': serializer.toJson<String>(exerciseName),
     };
   }
 
   ExerciseRecord copyWith(
-          {int id, int amountPerSet, int numSets, String name}) =>
+          {int id, int amountPerSet, int numSets, String exerciseName}) =>
       ExerciseRecord(
         id: id ?? this.id,
         amountPerSet: amountPerSet ?? this.amountPerSet,
         numSets: numSets ?? this.numSets,
-        name: name ?? this.name,
+        exerciseName: exerciseName ?? this.exerciseName,
       );
   @override
   String toString() {
@@ -98,14 +101,16 @@ class ExerciseRecord extends DataClass implements Insertable<ExerciseRecord> {
           ..write('id: $id, ')
           ..write('amountPerSet: $amountPerSet, ')
           ..write('numSets: $numSets, ')
-          ..write('name: $name')
+          ..write('exerciseName: $exerciseName')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(id.hashCode,
-      $mrjc(amountPerSet.hashCode, $mrjc(numSets.hashCode, name.hashCode))));
+  int get hashCode => $mrjf($mrjc(
+      id.hashCode,
+      $mrjc(amountPerSet.hashCode,
+          $mrjc(numSets.hashCode, exerciseName.hashCode))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -113,39 +118,39 @@ class ExerciseRecord extends DataClass implements Insertable<ExerciseRecord> {
           other.id == this.id &&
           other.amountPerSet == this.amountPerSet &&
           other.numSets == this.numSets &&
-          other.name == this.name);
+          other.exerciseName == this.exerciseName);
 }
 
 class ExerciseRecordsCompanion extends UpdateCompanion<ExerciseRecord> {
   final Value<int> id;
   final Value<int> amountPerSet;
   final Value<int> numSets;
-  final Value<String> name;
+  final Value<String> exerciseName;
   const ExerciseRecordsCompanion({
     this.id = const Value.absent(),
     this.amountPerSet = const Value.absent(),
     this.numSets = const Value.absent(),
-    this.name = const Value.absent(),
+    this.exerciseName = const Value.absent(),
   });
   ExerciseRecordsCompanion.insert({
     this.id = const Value.absent(),
     @required int amountPerSet,
     @required int numSets,
-    @required String name,
+    @required String exerciseName,
   })  : amountPerSet = Value(amountPerSet),
         numSets = Value(numSets),
-        name = Value(name);
+        exerciseName = Value(exerciseName);
   static Insertable<ExerciseRecord> custom({
     Expression<int> id,
     Expression<int> amountPerSet,
     Expression<int> numSets,
-    Expression<String> name,
+    Expression<String> exerciseName,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (amountPerSet != null) 'amount': amountPerSet,
       if (numSets != null) 'num_sets': numSets,
-      if (name != null) 'name': name,
+      if (exerciseName != null) 'exercise_name': exerciseName,
     });
   }
 
@@ -153,12 +158,12 @@ class ExerciseRecordsCompanion extends UpdateCompanion<ExerciseRecord> {
       {Value<int> id,
       Value<int> amountPerSet,
       Value<int> numSets,
-      Value<String> name}) {
+      Value<String> exerciseName}) {
     return ExerciseRecordsCompanion(
       id: id ?? this.id,
       amountPerSet: amountPerSet ?? this.amountPerSet,
       numSets: numSets ?? this.numSets,
-      name: name ?? this.name,
+      exerciseName: exerciseName ?? this.exerciseName,
     );
   }
 
@@ -174,8 +179,8 @@ class ExerciseRecordsCompanion extends UpdateCompanion<ExerciseRecord> {
     if (numSets.present) {
       map['num_sets'] = Variable<int>(numSets.value);
     }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
+    if (exerciseName.present) {
+      map['exercise_name'] = Variable<String>(exerciseName.value);
     }
     return map;
   }
@@ -186,7 +191,7 @@ class ExerciseRecordsCompanion extends UpdateCompanion<ExerciseRecord> {
           ..write('id: $id, ')
           ..write('amountPerSet: $amountPerSet, ')
           ..write('numSets: $numSets, ')
-          ..write('name: $name')
+          ..write('exerciseName: $exerciseName')
           ..write(')'))
         .toString();
   }
@@ -232,17 +237,20 @@ class $ExerciseRecordsTable extends ExerciseRecords
     );
   }
 
-  final VerificationMeta _nameMeta = const VerificationMeta('name');
-  GeneratedTextColumn _name;
+  final VerificationMeta _exerciseNameMeta =
+      const VerificationMeta('exerciseName');
+  GeneratedTextColumn _exerciseName;
   @override
-  GeneratedTextColumn get name => _name ??= _constructName();
-  GeneratedTextColumn _constructName() {
-    return GeneratedTextColumn('name', $tableName, false,
-        $customConstraints: 'REFERENCE exercises(name)');
+  GeneratedTextColumn get exerciseName =>
+      _exerciseName ??= _constructExerciseName();
+  GeneratedTextColumn _constructExerciseName() {
+    return GeneratedTextColumn('exercise_name', $tableName, false,
+        $customConstraints: 'REFERENCES exercises(name) ON DELETE CASCADE');
   }
 
   @override
-  List<GeneratedColumn> get $columns => [id, amountPerSet, numSets, name];
+  List<GeneratedColumn> get $columns =>
+      [id, amountPerSet, numSets, exerciseName];
   @override
   $ExerciseRecordsTable get asDslTable => this;
   @override
@@ -271,11 +279,13 @@ class $ExerciseRecordsTable extends ExerciseRecords
     } else if (isInserting) {
       context.missing(_numSetsMeta);
     }
-    if (data.containsKey('name')) {
+    if (data.containsKey('exercise_name')) {
       context.handle(
-          _nameMeta, name.isAcceptableOrUnknown(data['name'], _nameMeta));
+          _exerciseNameMeta,
+          exerciseName.isAcceptableOrUnknown(
+              data['exercise_name'], _exerciseNameMeta));
     } else if (isInserting) {
-      context.missing(_nameMeta);
+      context.missing(_exerciseNameMeta);
     }
     return context;
   }
@@ -470,7 +480,7 @@ class $ExercisesTable extends Exercises
   GeneratedTextColumn get muscle => _muscle ??= _constructMuscle();
   GeneratedTextColumn _constructMuscle() {
     return GeneratedTextColumn('muscle', $tableName, false,
-        minTextLength: 1, maxTextLength: 10);
+        minTextLength: 1, maxTextLength: 20);
   }
 
   final VerificationMeta _useBodyWeightMeta =
@@ -519,7 +529,7 @@ class $ExercisesTable extends Exercises
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {name};
   @override
   Exercise map(Map<String, dynamic> data, {String tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;

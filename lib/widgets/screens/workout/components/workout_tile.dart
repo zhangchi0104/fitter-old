@@ -14,7 +14,7 @@ class WorkoutItemTile extends StatelessWidget {
           Icons.android,
           size: 40,
         ),
-        title: Text(record.name),
+        title: Text(record.exerciseName),
         subtitle: Text("${record.amountPerSet}kg x ${record.numSets}"),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:moor_flutter/moor_flutter.dart';
 
 part 'table.g.dart';
 
+// child table
 class ExerciseRecords extends Table {
   IntColumn get id => integer().autoIncrement()();
 
@@ -9,15 +10,20 @@ class ExerciseRecords extends Table {
 
   IntColumn get numSets => integer()();
 
-  TextColumn get name => text().customConstraint("REFERENCE exercises(name)")();
+  TextColumn get exerciseName =>
+      text().customConstraint("REFERENCES exercises(name) ON DELETE CASCADE")();
 }
 
+// parent table
 class Exercises extends Table {
   TextColumn get name => text().withLength(min: 1, max: 50)();
 
   TextColumn get muscle => text().withLength(min: 1, max: 20)();
   BoolColumn get useBodyWeight =>
       boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {name};
 }
 
 @UseMoor(
@@ -35,6 +41,10 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (migrator) async {
+          await migrator.createTable(exercises);
+          await migrator.createTable(exerciseRecords);
+        },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
         },

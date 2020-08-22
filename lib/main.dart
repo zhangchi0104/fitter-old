@@ -13,7 +13,7 @@ void main() {
         },
         child: MyApp(),
         dispose: (ctx, db) async {
-          db.close();
+          await db.close();
           print("DB closed");
         }),
   );
