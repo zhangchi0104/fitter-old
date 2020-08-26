@@ -8,7 +8,7 @@ void main() {
     Provider(
         create: (_) {
           final db = AppDatabase();
-          db.exerciseRecordsDao.resetDB();
+          // db.exerciseRecordsDao.resetDB();
           return db;
         },
         child: MyApp(),
@@ -33,6 +33,15 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        appBarTheme: AppBarTheme.of(context).copyWith(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          textTheme: TextTheme(
+            headline6: TextStyle(color: Colors.black, fontSize: 20),
+          ),
+          iconTheme: IconTheme.of(context).copyWith(
+            color: Colors.black,
+          ),
+        ),
       ),
       home: FitterApp(),
     );

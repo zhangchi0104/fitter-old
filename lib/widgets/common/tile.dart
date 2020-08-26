@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class Tile extends StatelessWidget {
-  Tile({
-    Key key,
-    this.height,
-    this.width,
-    @required this.child,
-    this.padding = const EdgeInsets.all(5),
-    this.margin = const EdgeInsets.all(5),
-  }) : constraints = (width != null || height != null)
+  Tile(
+      {Key key,
+      this.height,
+      this.width,
+      @required this.child,
+      this.padding = const EdgeInsets.all(5),
+      this.margin = const EdgeInsets.all(5),
+      this.borderRadius})
+      : constraints = (width != null || height != null)
             ? BoxConstraints.tightFor(width: width, height: height)
             : BoxConstraints();
 
@@ -19,12 +20,14 @@ class Tile extends StatelessWidget {
   Widget child;
   EdgeInsetsGeometry padding;
   EdgeInsetsGeometry margin;
+  double borderRadius;
   @override
   Widget build(BuildContext context) {
+    print(borderRadius);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(this.borderRadius ?? 12),
         boxShadow: <BoxShadow>[
           BoxShadow(
             blurRadius: 4,

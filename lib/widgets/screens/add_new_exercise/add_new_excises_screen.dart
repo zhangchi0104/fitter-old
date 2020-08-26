@@ -1,3 +1,4 @@
+import 'package:fitter/models/daos.dart';
 import 'package:fitter/models/table.dart';
 import 'package:fitter/widgets/screens/add_new_exercise/components/body_part_selectIon_dialog.dart';
 import 'package:flutter/material.dart';

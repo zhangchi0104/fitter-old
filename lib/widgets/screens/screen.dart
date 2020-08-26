@@ -9,9 +9,11 @@ class ViewMap {
     @required this.builder,
     @required this.icon,
     this.actionButton,
+    this.color,
   });
   String title;
   Widget Function() builder;
   IconData icon;
   Widget actionButton;
+  MaterialColor color;
 }

@@ -1,3 +1,4 @@
+import 'package:fitter/models/daos.dart';
 import 'package:fitter/models/table.dart';
 import 'package:fitter/widgets/screens/exercises/components/exercise_list_view.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +15,9 @@ class ExercisesScreen extends StatefulWidget {
 class _ExercisesScreenState extends State<ExercisesScreen> {
   @override
   Widget build(BuildContext context) {
-    final db = Provider.of<AppDatabase>(context);
+    final exercisesDao = Provider.of<AppDatabase>(context).exercisesDao;
     return StreamProvider.value(
-      value: db.exercisesDao.watchAllExercises(),
+      value: exercisesDao.watchAllExercises(),
       child: _buildListView(context),
       initialData: <Exercise>[],
     );
