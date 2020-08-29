@@ -17,9 +17,10 @@ class DatePickerButton extends StatelessWidget {
         color: Colors.orange[400],
       ),
       onPressed: () async {
-        final firstEntry = await dao.getFirstEntry();
+        final entries = await dao.getAllEntries();
+
         final dateToday = getDateToday();
-        final beginDate = firstEntry?.first?.date ?? dateToday;
+        final beginDate = entries.length > 0 ? entries[0].date : dateToday;
         final date = await showDatePicker(
           context: context,
           initialDate: dateToday,

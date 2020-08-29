@@ -11,7 +11,7 @@ class WorkoutItemListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(items);
+    //print(items);
     return _buildListView(context);
   }
 

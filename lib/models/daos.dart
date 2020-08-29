@@ -46,6 +46,14 @@ class ExercisesDao extends DatabaseAccessor<AppDatabase>
     return select(exercises).watch();
   }
 
+  Stream<List<Exercise>> watchExercisesByName(String name) {
+    print("Dao: watch on keyword $name");
+    if (name == null || name.isEmpty) {
+      return watchAllExercises();
+    }
+    return (select(exercises)..where((e) => e.name.contains(name))).watch();
+  }
+
   Future<int> insert(Insertable<Exercise> exercise) {
     return into(exercises).insert(exercise);
   }
@@ -79,7 +87,7 @@ class WorkoutEntriesDao extends DatabaseAccessor<AppDatabase>
     return into(workoutEntries).insert(newEntry);
   }
 
-  Future<List<WorkoutEntry>> getFirstEntry() {
+  Future<List<WorkoutEntry>> getAllEntries() {
     return (select(workoutEntries)).get();
   }
 }

@@ -1,48 +1,17 @@
 import 'package:fitter/models/database.dart';
+import 'package:fitter/providers/add_new_exercise_view_model.dart';
 import 'package:fitter/widgets/screens/add_new_exercise/components/dialogs.dart';
 import 'package:flutter/material.dart';
-import 'package:moor_flutter/moor_flutter.dart' hide Column;
+
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
-class AddNewExerciseScreen extends StatefulWidget {
-  AddNewExerciseScreen({Key key}) : super(key: key);
-  AddNewExerciseScreen.update(this.exercise);
-  Exercise exercise;
-  @override
-  _AddNewExerciseScreenState createState() => _AddNewExerciseScreenState();
-}
-
-class _AddNewExerciseScreenState extends State<AddNewExerciseScreen> {
-  TextEditingController textEditingController;
-  String selectedBodyPart = "None";
-  String selectedEquipment = "Body weight";
-  bool validateInput = true;
-  @override
-  void initState() {
-    textEditingController = TextEditingController();
-    textEditingController.text = widget.exercise?.name ?? "";
-    this.selectedBodyPart = widget.exercise?.muscle ?? "None";
-    this.selectedEquipment = widget.exercise?.equipment ?? "Body Weight";
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    textEditingController.dispose();
-    super.dispose();
-  }
+class _AddNewExerciseScreen extends StatelessWidget {
+  _AddNewExerciseScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final db = Provider.of<AppDatabase>(context);
-    return Provider.value(
-      value: db.exercisesDao,
-      child: _buildContent(context),
-    );
-  }
-
-  Widget _buildContent(BuildContext context) {
+    final viewModel = Provider.of<AddNewExerciseScreenViewModel>(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -52,91 +21,98 @@ class _AddNewExerciseScreenState extends State<AddNewExerciseScreen> {
           margin: EdgeInsets.all(20),
           child: Column(
             children: [
-              _buildTextField(context),
+              _buildTextField(context, viewModel),
               SizedBox(height: 3),
-              _buildBodyPartSelectionButton(context),
-              _buildEquipmentSelectionButton(context),
+              _buildBodyPartSelectionButton(context, viewModel),
+              _buildEquipmentSelectionButton(context, viewModel),
             ],
           ),
         ),
-        floatingActionButton: Consumer<ExercisesDao>(
-            builder: (ctx, dao, _) => _buildFloatingActionButton(ctx, dao)),
+        floatingActionButton: _buildFloatingActionButton(context, viewModel),
       ),
     );
   }
 
   Widget _buildFloatingActionButton(
-      BuildContext context, ExercisesDao exercisesDao) {
+      BuildContext context, AddNewExerciseScreenViewModel viewModel) {
     return FloatingActionButton(
       child: Icon(Icons.check),
       onPressed: () async {
-        if (textEditingController.text.isEmpty) {
-          this.setState(() {
-            validateInput = false;
-            return;
-          });
+        if (viewModel.exerciseName.isEmpty) {
+          viewModel.isInputValid = false;
+          return;
         }
-        if (widget.exercise == null) {
-          await exercisesDao.insert(ExercisesCompanion.insert(
-            name: textEditingController.text,
-            muscle: this.selectedBodyPart,
-            equipment: this.selectedEquipment,
-          ));
+        if (viewModel.exercise == null) {
+          viewModel.insertCurrentState();
         } else {
-          final updatedExercise = ExercisesCompanion.insert(
-            id: Value(widget.exercise.id),
-            name: textEditingController.text,
-            muscle: selectedBodyPart,
-            equipment: selectedEquipment,
-          );
-          await exercisesDao.updateExercise(updatedExercise);
+          viewModel.updateOnCurrentState();
         }
         Navigator.pop(context);
       },
     );
   }
 
-  Widget _buildBodyPartSelectionButton(BuildContext context) {
+  Widget _buildBodyPartSelectionButton(
+      BuildContext context, AddNewExerciseScreenViewModel viewModel) {
     return ListTile(
       title: Text("Body Part"),
-      trailing: Text(selectedBodyPart),
+      trailing: Text(viewModel.bodyPart),
       onTap: () async {
         final res = await showDialog<String>(
           context: context,
           builder: (_) => BodyPartSelectionDialog(),
         );
-        setState(() {
-          this.selectedBodyPart = res;
-        });
+        viewModel.bodyPart = res;
       },
     );
   }
 
-  Widget _buildEquipmentSelectionButton(BuildContext context) {
+  Widget _buildEquipmentSelectionButton(
+      BuildContext context, AddNewExerciseScreenViewModel viewModel) {
     return ListTile(
       title: Text("Equipment"),
-      trailing: Text(selectedEquipment),
+      trailing: Text(viewModel.equipment),
       onTap: () async {
         final res = await showDialog<String>(
           context: context,
           builder: (_) => EquipmentsSelectionDialog(),
         );
-        setState(() {
-          this.selectedEquipment = res;
-        });
+        viewModel.equipment = res;
       },
     );
   }
 
-  Widget _buildTextField(BuildContext context) {
+  Widget _buildTextField(
+      BuildContext context, AddNewExerciseScreenViewModel viewModel) {
     return TextField(
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         labelText: "Exercise Name",
-        errorText: validateInput ? null : "Must Not be empty",
+        errorText: viewModel.isInputValid ? null : "Must Not be empty",
       ),
       maxLength: 50,
-      controller: textEditingController,
+      controller: viewModel.controller,
     );
+  }
+}
+
+class AddNewExerciseScreen extends StatelessWidget {
+  // ignore: avoid_init_to_null
+  const AddNewExerciseScreen({this.exercise = null});
+  const AddNewExerciseScreen.update(this.exercise);
+
+  final Exercise exercise;
+  @override
+  Widget build(BuildContext context) {
+    final dao = Provider.of<AppDatabase>(context).exercisesDao;
+    return exercise == null
+        ? ChangeNotifierProvider(
+            create: (_) => AddNewExerciseScreenViewModel(dao),
+            builder: (_, __) => _AddNewExerciseScreen(),
+          )
+        : ChangeNotifierProvider(
+            create: (_) => AddNewExerciseScreenViewModel.update(dao, exercise),
+            child: _AddNewExerciseScreen(),
+          );
   }
 }
