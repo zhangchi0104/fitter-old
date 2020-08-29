@@ -17,11 +17,11 @@ class _WorkoutRecordItemTileState extends State<WorkoutRecordItemTile> {
 
   @override
   void initState() {
-    // TODO: implement initState
     weightTextController = TextEditingController();
     repsTextContoller = TextEditingController();
     weightTextController.text = widget.record.weight.toString();
     repsTextContoller.text = widget.record.reps.toString();
+    super.initState();
   }
 
   @override
@@ -60,7 +60,6 @@ class _WorkoutRecordItemTileState extends State<WorkoutRecordItemTile> {
                   reps: Value(int.parse(repsTextContoller.text)),
                   weight: Value(int.parse(weightTextController.text)),
                   workoutEntryId: Value(widget.record.workoutEntryId),
-                
                 );
                 await dao.updateEntry(newRecord);
               },

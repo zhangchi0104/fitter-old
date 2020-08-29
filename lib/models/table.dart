@@ -8,27 +8,25 @@ class ExerciseRecords extends Table {
   IntColumn get reps => integer().withDefault(const Constant(0))();
   IntColumn get weight => integer().withDefault(const Constant(0))();
 
-  IntColumn get workoutEntryId => integer()
-      .customConstraint("REFERENCES workout_entries(id) ON DELETE CASCADE")();
+  IntColumn get workoutEntryId => integer().customConstraint(
+      "REFERENCES workout_entries(id) ON DELETE CASCADE ON UPDATE CASCADE")();
 }
 
 @DataClassName("WorkoutEntry")
 class WorkoutEntries extends Table {
   IntColumn get id => integer().autoIncrement()();
   DateTimeColumn get date => dateTime()();
-  TextColumn get exerciseName =>
-      text().customConstraint("REFERENCES exercises(name) ON DELETE CASCADE")();
+  TextColumn get exerciseName => text().customConstraint(
+      "REFERENCES exercises(name) ON DELETE CASCADE ON UPDATE CASCADE")();
 }
 
 // parent table
 class Exercises extends Table {
-  TextColumn get name => text().withLength(min: 1, max: 50)();
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name =>
+      text().withLength(min: 1, max: 50).customConstraint('UNIQUE')();
   TextColumn get muscle => text().withLength(min: 1, max: 20)();
-  BoolColumn get useBodyWeight =>
-      boolean().withDefault(const Constant(false))();
-
-  @override
-  Set<Column> get primaryKey => {name};
+  TextColumn get equipment => text().withLength(min: 1, max: 20)();
 }
 
 @UseMoor(tables: [
@@ -48,7 +46,7 @@ class AppDatabase extends _$AppDatabase {
         );
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -64,6 +62,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from == 2) {
             await migrator.createAll();
+          }
+          if (from == 3) {
+            await migrator.addColumn(exercises, exercises.id);
           }
           return;
         },

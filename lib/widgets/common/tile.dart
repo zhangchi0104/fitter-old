@@ -30,9 +30,9 @@ class Tile extends StatelessWidget {
         borderRadius: BorderRadius.circular(this.borderRadius ?? 12),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            blurRadius: 4,
+            blurRadius: 2,
             color: Color.fromARGB(66, 137, 194, 233),
-            offset: Offset(3, 3),
+            offset: Offset(1.5, 1.5),
           ),
         ],
       ),

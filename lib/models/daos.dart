@@ -46,13 +46,20 @@ class ExercisesDao extends DatabaseAccessor<AppDatabase>
     return select(exercises).watch();
   }
 
-  Future<int> insert(String name, String bodyPart) {
-    return into(exercises)
-        .insert(ExercisesCompanion.insert(name: name, muscle: bodyPart));
+  Future<int> insert(Insertable<Exercise> exercise) {
+    return into(exercises).insert(exercise);
   }
 
   Future<List<Exercise>> getAllExercises() {
     return select(exercises).get();
+  }
+
+  Future<bool> updateExercise(Insertable<Exercise> exercise) {
+    return update(exercises).replace(exercise);
+  }
+
+  Future<int> removeExerciseByID(int id) {
+    return (delete(exercises)..where((e) => e.id.equals(id))).go();
   }
 }
 
@@ -72,7 +79,7 @@ class WorkoutEntriesDao extends DatabaseAccessor<AppDatabase>
     return into(workoutEntries).insert(newEntry);
   }
 
-  Future<WorkoutEntry> getFirstEntry() {
-    return (select(workoutEntries)).getSingle();
+  Future<List<WorkoutEntry>> getFirstEntry() {
+    return (select(workoutEntries)).get();
   }
 }

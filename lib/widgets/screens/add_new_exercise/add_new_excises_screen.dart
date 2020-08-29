@@ -1,12 +1,14 @@
-import 'package:fitter/models/daos.dart';
-import 'package:fitter/models/table.dart';
-import 'package:fitter/widgets/screens/add_new_exercise/components/body_part_selectIon_dialog.dart';
+import 'package:fitter/models/database.dart';
+import 'package:fitter/widgets/screens/add_new_exercise/components/dialogs.dart';
 import 'package:flutter/material.dart';
+import 'package:moor_flutter/moor_flutter.dart' hide Column;
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class AddNewExerciseScreen extends StatefulWidget {
   AddNewExerciseScreen({Key key}) : super(key: key);
-
+  AddNewExerciseScreen.update(this.exercise);
+  Exercise exercise;
   @override
   _AddNewExerciseScreenState createState() => _AddNewExerciseScreenState();
 }
@@ -14,12 +16,14 @@ class AddNewExerciseScreen extends StatefulWidget {
 class _AddNewExerciseScreenState extends State<AddNewExerciseScreen> {
   TextEditingController textEditingController;
   String selectedBodyPart = "None";
-  bool useBodyWeight = false;
+  String selectedEquipment = "Body weight";
   bool validateInput = true;
   @override
   void initState() {
     textEditingController = TextEditingController();
-
+    textEditingController.text = widget.exercise?.name ?? "";
+    this.selectedBodyPart = widget.exercise?.muscle ?? "None";
+    this.selectedEquipment = widget.exercise?.equipment ?? "Body Weight";
     super.initState();
   }
 
@@ -39,29 +43,25 @@ class _AddNewExerciseScreenState extends State<AddNewExerciseScreen> {
   }
 
   Widget _buildContent(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Add New Exercise"),
-      ),
-      body: Container(
-        margin: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildTextField(context),
-            SizedBox(height: 3),
-            _buildBodyPartSelectionButton(context),
-            CheckboxListTile(
-              value: useBodyWeight,
-              title: Text("Uses Body Weight?"),
-              onChanged: (val) => setState(() {
-                useBodyWeight = val;
-              }),
-            )
-          ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Add New Exercise"),
         ),
+        body: Container(
+          margin: EdgeInsets.all(20),
+          child: Column(
+            children: [
+              _buildTextField(context),
+              SizedBox(height: 3),
+              _buildBodyPartSelectionButton(context),
+              _buildEquipmentSelectionButton(context),
+            ],
+          ),
+        ),
+        floatingActionButton: Consumer<ExercisesDao>(
+            builder: (ctx, dao, _) => _buildFloatingActionButton(ctx, dao)),
       ),
-      floatingActionButton: Consumer<ExercisesDao>(
-          builder: (ctx, dao, _) => _buildFloatingActionButton(ctx, dao)),
     );
   }
 
@@ -76,10 +76,21 @@ class _AddNewExerciseScreenState extends State<AddNewExerciseScreen> {
             return;
           });
         }
-        await exercisesDao.insert(
-          textEditingController.text,
-          selectedBodyPart,
-        );
+        if (widget.exercise == null) {
+          await exercisesDao.insert(ExercisesCompanion.insert(
+            name: textEditingController.text,
+            muscle: this.selectedBodyPart,
+            equipment: this.selectedEquipment,
+          ));
+        } else {
+          final updatedExercise = ExercisesCompanion.insert(
+            id: Value(widget.exercise.id),
+            name: textEditingController.text,
+            muscle: selectedBodyPart,
+            equipment: selectedEquipment,
+          );
+          await exercisesDao.updateExercise(updatedExercise);
+        }
         Navigator.pop(context);
       },
     );
@@ -96,6 +107,22 @@ class _AddNewExerciseScreenState extends State<AddNewExerciseScreen> {
         );
         setState(() {
           this.selectedBodyPart = res;
+        });
+      },
+    );
+  }
+
+  Widget _buildEquipmentSelectionButton(BuildContext context) {
+    return ListTile(
+      title: Text("Equipment"),
+      trailing: Text(selectedEquipment),
+      onTap: () async {
+        final res = await showDialog<String>(
+          context: context,
+          builder: (_) => EquipmentsSelectionDialog(),
+        );
+        setState(() {
+          this.selectedEquipment = res;
         });
       },
     );

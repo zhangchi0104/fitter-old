@@ -9,9 +9,11 @@ class ExerciseListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: ListView.builder(
-        itemBuilder: (_, i) => ExerciseTile(exercises[i]),
-        itemCount: exercises.length,
+      child: SliverList(
+        delegate: SliverChildBuilderDelegate(
+           (_, i) => ExerciseTile(exercises[i]),
+          childCount: exercises.length,
+        ),
       ),
     );
   }

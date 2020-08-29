@@ -53,24 +53,20 @@ class _FitterAppState extends State<FitterApp> {
   }
 
   Widget _buildFitterApp(BuildContext context) {
-    return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(pages[selectedIndex].title),
-      //   actions: [pages[selectedIndex].actionButton ?? Container()],
-      //   backgroundColor: Colors.white,
-      // ),
-      body: PageView.builder(
-        itemBuilder: (_, i) => pages[i].builder(),
-        itemCount: pages.length,
-        controller: controller,
-        onPageChanged: (i) => setState(
-          () {
-            this.selectedIndex = i;
-          },
+    return SafeArea(
+      child: Scaffold(
+        body: PageView.builder(
+          itemBuilder: (_, i) => pages[i].builder(),
+          itemCount: pages.length,
+          controller: controller,
+          onPageChanged: (i) => setState(
+            () {
+              this.selectedIndex = i;
+            },
+          ),
         ),
+        bottomNavigationBar: _buildBottomNavigationBar(context),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
-      // floatingActionButton: pages[selectedIndex].actionButton,
     );
   }
 

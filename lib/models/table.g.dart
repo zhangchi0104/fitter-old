@@ -226,7 +226,8 @@ class $ExerciseRecordsTable extends ExerciseRecords
       _workoutEntryId ??= _constructWorkoutEntryId();
   GeneratedIntColumn _constructWorkoutEntryId() {
     return GeneratedIntColumn('workout_entry_id', $tableName, false,
-        $customConstraints: 'REFERENCES workout_entries(id) ON DELETE CASCADE');
+        $customConstraints:
+            'REFERENCES workout_entries(id) ON DELETE CASCADE ON UPDATE CASCADE');
   }
 
   @override
@@ -279,49 +280,56 @@ class $ExerciseRecordsTable extends ExerciseRecords
 }
 
 class Exercise extends DataClass implements Insertable<Exercise> {
+  final int id;
   final String name;
   final String muscle;
-  final bool useBodyWeight;
+  final String equipment;
   Exercise(
-      {@required this.name,
+      {@required this.id,
+      @required this.name,
       @required this.muscle,
-      @required this.useBodyWeight});
+      @required this.equipment});
   factory Exercise.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
+    final intType = db.typeSystem.forDartType<int>();
     final stringType = db.typeSystem.forDartType<String>();
-    final boolType = db.typeSystem.forDartType<bool>();
     return Exercise(
+      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
       name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name']),
       muscle:
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}muscle']),
-      useBodyWeight: boolType
-          .mapFromDatabaseResponse(data['${effectivePrefix}use_body_weight']),
+      equipment: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}equipment']),
     );
   }
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (!nullToAbsent || id != null) {
+      map['id'] = Variable<int>(id);
+    }
     if (!nullToAbsent || name != null) {
       map['name'] = Variable<String>(name);
     }
     if (!nullToAbsent || muscle != null) {
       map['muscle'] = Variable<String>(muscle);
     }
-    if (!nullToAbsent || useBodyWeight != null) {
-      map['use_body_weight'] = Variable<bool>(useBodyWeight);
+    if (!nullToAbsent || equipment != null) {
+      map['equipment'] = Variable<String>(equipment);
     }
     return map;
   }
 
   ExercisesCompanion toCompanion(bool nullToAbsent) {
     return ExercisesCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
       name: name == null && nullToAbsent ? const Value.absent() : Value(name),
       muscle:
           muscle == null && nullToAbsent ? const Value.absent() : Value(muscle),
-      useBodyWeight: useBodyWeight == null && nullToAbsent
+      equipment: equipment == null && nullToAbsent
           ? const Value.absent()
-          : Value(useBodyWeight),
+          : Value(equipment),
     );
   }
 
@@ -329,96 +337,114 @@ class Exercise extends DataClass implements Insertable<Exercise> {
       {ValueSerializer serializer}) {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return Exercise(
+      id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       muscle: serializer.fromJson<String>(json['muscle']),
-      useBodyWeight: serializer.fromJson<bool>(json['useBodyWeight']),
+      equipment: serializer.fromJson<String>(json['equipment']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer serializer}) {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'muscle': serializer.toJson<String>(muscle),
-      'useBodyWeight': serializer.toJson<bool>(useBodyWeight),
+      'equipment': serializer.toJson<String>(equipment),
     };
   }
 
-  Exercise copyWith({String name, String muscle, bool useBodyWeight}) =>
+  Exercise copyWith({int id, String name, String muscle, String equipment}) =>
       Exercise(
+        id: id ?? this.id,
         name: name ?? this.name,
         muscle: muscle ?? this.muscle,
-        useBodyWeight: useBodyWeight ?? this.useBodyWeight,
+        equipment: equipment ?? this.equipment,
       );
   @override
   String toString() {
     return (StringBuffer('Exercise(')
+          ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('muscle: $muscle, ')
-          ..write('useBodyWeight: $useBodyWeight')
+          ..write('equipment: $equipment')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => $mrjf(
-      $mrjc(name.hashCode, $mrjc(muscle.hashCode, useBodyWeight.hashCode)));
+  int get hashCode => $mrjf($mrjc(id.hashCode,
+      $mrjc(name.hashCode, $mrjc(muscle.hashCode, equipment.hashCode))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is Exercise &&
+          other.id == this.id &&
           other.name == this.name &&
           other.muscle == this.muscle &&
-          other.useBodyWeight == this.useBodyWeight);
+          other.equipment == this.equipment);
 }
 
 class ExercisesCompanion extends UpdateCompanion<Exercise> {
+  final Value<int> id;
   final Value<String> name;
   final Value<String> muscle;
-  final Value<bool> useBodyWeight;
+  final Value<String> equipment;
   const ExercisesCompanion({
+    this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.muscle = const Value.absent(),
-    this.useBodyWeight = const Value.absent(),
+    this.equipment = const Value.absent(),
   });
   ExercisesCompanion.insert({
+    this.id = const Value.absent(),
     @required String name,
     @required String muscle,
-    this.useBodyWeight = const Value.absent(),
+    @required String equipment,
   })  : name = Value(name),
-        muscle = Value(muscle);
+        muscle = Value(muscle),
+        equipment = Value(equipment);
   static Insertable<Exercise> custom({
+    Expression<int> id,
     Expression<String> name,
     Expression<String> muscle,
-    Expression<bool> useBodyWeight,
+    Expression<String> equipment,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (muscle != null) 'muscle': muscle,
-      if (useBodyWeight != null) 'use_body_weight': useBodyWeight,
+      if (equipment != null) 'equipment': equipment,
     });
   }
 
   ExercisesCompanion copyWith(
-      {Value<String> name, Value<String> muscle, Value<bool> useBodyWeight}) {
+      {Value<int> id,
+      Value<String> name,
+      Value<String> muscle,
+      Value<String> equipment}) {
     return ExercisesCompanion(
+      id: id ?? this.id,
       name: name ?? this.name,
       muscle: muscle ?? this.muscle,
-      useBodyWeight: useBodyWeight ?? this.useBodyWeight,
+      equipment: equipment ?? this.equipment,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
     if (muscle.present) {
       map['muscle'] = Variable<String>(muscle.value);
     }
-    if (useBodyWeight.present) {
-      map['use_body_weight'] = Variable<bool>(useBodyWeight.value);
+    if (equipment.present) {
+      map['equipment'] = Variable<String>(equipment.value);
     }
     return map;
   }
@@ -426,9 +452,10 @@ class ExercisesCompanion extends UpdateCompanion<Exercise> {
   @override
   String toString() {
     return (StringBuffer('ExercisesCompanion(')
+          ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('muscle: $muscle, ')
-          ..write('useBodyWeight: $useBodyWeight')
+          ..write('equipment: $equipment')
           ..write(')'))
         .toString();
   }
@@ -439,13 +466,22 @@ class $ExercisesTable extends Exercises
   final GeneratedDatabase _db;
   final String _alias;
   $ExercisesTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  GeneratedIntColumn _id;
+  @override
+  GeneratedIntColumn get id => _id ??= _constructId();
+  GeneratedIntColumn _constructId() {
+    return GeneratedIntColumn('id', $tableName, false,
+        hasAutoIncrement: true, declaredAsPrimaryKey: true);
+  }
+
   final VerificationMeta _nameMeta = const VerificationMeta('name');
   GeneratedTextColumn _name;
   @override
   GeneratedTextColumn get name => _name ??= _constructName();
   GeneratedTextColumn _constructName() {
     return GeneratedTextColumn('name', $tableName, false,
-        minTextLength: 1, maxTextLength: 50);
+        minTextLength: 1, maxTextLength: 50, $customConstraints: 'UNIQUE');
   }
 
   final VerificationMeta _muscleMeta = const VerificationMeta('muscle');
@@ -457,19 +493,17 @@ class $ExercisesTable extends Exercises
         minTextLength: 1, maxTextLength: 20);
   }
 
-  final VerificationMeta _useBodyWeightMeta =
-      const VerificationMeta('useBodyWeight');
-  GeneratedBoolColumn _useBodyWeight;
+  final VerificationMeta _equipmentMeta = const VerificationMeta('equipment');
+  GeneratedTextColumn _equipment;
   @override
-  GeneratedBoolColumn get useBodyWeight =>
-      _useBodyWeight ??= _constructUseBodyWeight();
-  GeneratedBoolColumn _constructUseBodyWeight() {
-    return GeneratedBoolColumn('use_body_weight', $tableName, false,
-        defaultValue: const Constant(false));
+  GeneratedTextColumn get equipment => _equipment ??= _constructEquipment();
+  GeneratedTextColumn _constructEquipment() {
+    return GeneratedTextColumn('equipment', $tableName, false,
+        minTextLength: 1, maxTextLength: 20);
   }
 
   @override
-  List<GeneratedColumn> get $columns => [name, muscle, useBodyWeight];
+  List<GeneratedColumn> get $columns => [id, name, muscle, equipment];
   @override
   $ExercisesTable get asDslTable => this;
   @override
@@ -481,6 +515,9 @@ class $ExercisesTable extends Exercises
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id'], _idMeta));
+    }
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name'], _nameMeta));
@@ -493,17 +530,17 @@ class $ExercisesTable extends Exercises
     } else if (isInserting) {
       context.missing(_muscleMeta);
     }
-    if (data.containsKey('use_body_weight')) {
-      context.handle(
-          _useBodyWeightMeta,
-          useBodyWeight.isAcceptableOrUnknown(
-              data['use_body_weight'], _useBodyWeightMeta));
+    if (data.containsKey('equipment')) {
+      context.handle(_equipmentMeta,
+          equipment.isAcceptableOrUnknown(data['equipment'], _equipmentMeta));
+    } else if (isInserting) {
+      context.missing(_equipmentMeta);
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {name};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Exercise map(Map<String, dynamic> data, {String tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
@@ -704,7 +741,8 @@ class $WorkoutEntriesTable extends WorkoutEntries
       _exerciseName ??= _constructExerciseName();
   GeneratedTextColumn _constructExerciseName() {
     return GeneratedTextColumn('exercise_name', $tableName, false,
-        $customConstraints: 'REFERENCES exercises(name) ON DELETE CASCADE');
+        $customConstraints:
+            'REFERENCES exercises(name) ON DELETE CASCADE ON UPDATE CASCADE');
   }
 
   @override

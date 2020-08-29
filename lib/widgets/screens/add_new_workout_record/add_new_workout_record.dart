@@ -1,8 +1,5 @@
-import 'package:fitter/models/daos.dart';
-import 'package:fitter/models/table.dart';
-import 'package:fitter/widgets/screens/add_new_workout_record/components/exercise_choice.dart';
+import 'package:fitter/models/database.dart';
 import 'package:fitter/widgets/screens/add_new_workout_record/components/exercise_choice_listview.dart';
-import 'package:fitter/widgets/screens/exercises/components/exercise_list_view.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

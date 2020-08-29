@@ -1,5 +1,6 @@
 import 'package:fitter/models/table.dart';
 import 'package:fitter/providers/workout_state.dart';
+import 'package:fitter/widgets/common/page_app_bar.dart';
 import 'package:fitter/widgets/screens/datepicker_button/datepicker_button.dart';
 import 'components/workout_list.dart';
 import 'package:flutter/material.dart';
@@ -10,32 +11,19 @@ class WorkoutScreen extends StatelessWidget {
   static String get routeName => "/workout";
 
   Widget _buildScreen(BuildContext context) {
-    return Center(
-      child: Consumer<List<WorkoutEntry>>(
-        builder: (_, data, __) {
-          return CustomScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                expandedHeight: 110,
-                actions: [DatePickerButton()],
-                flexibleSpace: const FlexibleSpaceBar(
-                  // centerTitle: true,
-                  titlePadding: EdgeInsets.only(left: 20, bottom: 16),
-                  title: Text(
-                    'Workouts',
-                    style: TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-              WorkoutItemListView(data),
-            ],
-          );
-        },
-      ),
+    return Consumer<List<WorkoutEntry>>(
+      builder: (_, data, __) {
+        return CustomScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          slivers: [
+            PageAppBar(
+              title: "Workouts",
+              actions: [DatePickerButton()],
+            ),
+            WorkoutItemListView(data),
+          ],
+        );
+      },
     );
   }
 

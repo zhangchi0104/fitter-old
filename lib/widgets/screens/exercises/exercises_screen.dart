@@ -1,5 +1,6 @@
-import 'package:fitter/models/daos.dart';
 import 'package:fitter/models/table.dart';
+import 'package:fitter/widgets/common/page_app_bar.dart';
+import 'package:fitter/widgets/screens/exercises/components/add_new_exercise_button.dart';
 import 'package:fitter/widgets/screens/exercises/components/exercise_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,15 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
   Widget _buildListView(BuildContext context) {
     return Consumer<List<Exercise>>(
       builder: (_, data, __) {
-        return ExerciseListView(data);
+        return CustomScrollView(
+          slivers: [
+            PageAppBar(
+              title: "Exercises",
+              actions: [AddNewExerciseButton()],
+            ),
+            ExerciseListView(data),
+          ],
+        );
       },
     );
   }

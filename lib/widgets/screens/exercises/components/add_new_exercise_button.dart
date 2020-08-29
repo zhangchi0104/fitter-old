@@ -7,7 +7,10 @@ class AddNewExerciseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.add),
+      icon: Icon(
+        Icons.add,
+        color: Colors.blue,
+      ),
       onPressed: () {
         final pageRoute = MaterialPageRoute(
           builder: (_) => AddNewExerciseScreen(),

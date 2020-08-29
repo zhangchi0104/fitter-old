@@ -1,27 +1,13 @@
 import 'package:flutter/material.dart';
 
-class BodyPartSelectionDialog extends StatefulWidget {
-  const BodyPartSelectionDialog();
-
+class OptionsSelectionDialog extends StatefulWidget {
+  OptionsSelectionDialog(this.options);
+  final List<String> options;
   @override
-  _BodyPartSelectionDialogState createState() =>
-      _BodyPartSelectionDialogState();
+  _OptionsSelectionDialogState createState() => _OptionsSelectionDialogState();
 }
 
-class _BodyPartSelectionDialogState extends State<BodyPartSelectionDialog> {
-  final bodyParts = const [
-    "None",
-    "Core",
-    "Arms",
-    "Back",
-    "Chest",
-    "Legs",
-    "Shoulders",
-    "Other",
-    "Olympic",
-    "Full Body",
-    "Cardio",
-  ];
+class _OptionsSelectionDialogState extends State<OptionsSelectionDialog> {
   var selectedIndex = 0;
 
   @override
@@ -41,7 +27,7 @@ class _BodyPartSelectionDialogState extends State<BodyPartSelectionDialog> {
         FlatButton(
           child: Text("OK"),
           onPressed: () {
-            Navigator.pop(context, bodyParts[selectedIndex]);
+            Navigator.pop(context, widget.options[selectedIndex]);
           },
         ),
       ],
@@ -51,16 +37,16 @@ class _BodyPartSelectionDialogState extends State<BodyPartSelectionDialog> {
   Widget _buildRadioButtons(BuildContext context) {
     return ListView.builder(
       itemBuilder: (_, i) => RadioListTile<String>(
-        groupValue: bodyParts[selectedIndex],
-        value: bodyParts[i],
-        title: Text(bodyParts[i]),
+        groupValue: widget.options[selectedIndex],
+        value: widget.options[i],
+        title: Text(widget.options[i]),
         onChanged: (value) {
           this.setState(() {
             selectedIndex = i;
           });
         },
       ),
-      itemCount: 10,
+      itemCount: widget.options.length,
     );
   }
 }
