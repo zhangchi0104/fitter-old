@@ -3,7 +3,7 @@ import './table.dart';
 
 part 'daos.g.dart';
 
-@UseDao(tables: [ExerciseRecords])
+@UseDao(tables: [workout])
 class ExerciseRecordsDao extends DatabaseAccessor<AppDatabase>
     with _$ExerciseRecordsDaoMixin {
   final AppDatabase db;
@@ -18,8 +18,8 @@ class ExerciseRecordsDao extends DatabaseAccessor<AppDatabase>
     return into(exerciseRecords).insert(entry);
   }
 
-  // WARNING: This function sould only be used for testing purpose
-  Future resetDB() {
+  // WARNING: This function should only be used for testing purpose
+  Future resetTable() {
     return (delete(exerciseRecords)..where((t) => t.id.isBiggerOrEqualValue(0)))
         .go();
   }
@@ -32,6 +32,11 @@ class ExerciseRecordsDao extends DatabaseAccessor<AppDatabase>
     return (select(exerciseRecords)
           ..where((record) => record.workoutEntryId.equals(workoutId)))
         .watch();
+  }
+
+  Future<int> deleteRecordById(int id) {
+    return (delete(exerciseRecords)..where((record) => record.id.equals(id)))
+        .go();
   }
 }
 
@@ -71,7 +76,14 @@ class ExercisesDao extends DatabaseAccessor<AppDatabase>
   }
 }
 
-@UseDao(tables: [WorkoutEntries])
+class WorkoutEntryWithExercise {
+  WorkoutEntry entry;
+  Exercise exercise;
+
+  WorkoutEntryWithExercise(this.entry, this.exercise);
+}
+
+@UseDao(tables: [, Exercises])
 class WorkoutEntriesDao extends DatabaseAccessor<AppDatabase>
     with _$WorkoutEntriesDaoMixin {
   final AppDatabase db;
@@ -89,5 +101,25 @@ class WorkoutEntriesDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<WorkoutEntry>> getAllEntries() {
     return (select(workoutEntries)).get();
+  }
+
+  Stream<List<WorkoutEntryWithExercise>> watchEntriesWithExerciseByDate(
+      DateTime date) {
+    final query = (select(workoutEntries)
+          ..where(
+            (e) => e.date.equals(date),
+          ))
+        .join([
+      leftOuterJoin(
+          exercises, exercises.name.equalsExp(workoutEntries.exerciseName)),
+    ]);
+    return query.watch().map((rows) {
+      return rows.map((row) {
+        return WorkoutEntryWithExercise(
+          row.readTable(workoutEntries),
+          row.readTable(exercises),
+        );
+      }).toList();
+    });
   }
 }
